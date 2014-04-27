@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Ratchet template page</title>
+    <title>Grocery List</title>
 
     <link rel="shortcut icon" href="@Url.Content("favicon.ico")">
 
@@ -19,101 +19,56 @@
 
     <!-- Include the compiled Ratchet JS -->
     <script src="js\ratchet.min.js"></script>
+    <script type="text/javascript" src="js\jquery-1.11.0.min.js"></script>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+          $("#addItem").click(function() {
+              $(".content .table-view").append("<input id=\"newItemEdit\"type=\"text\" placeholder=\"new item\"/>");
+              $(":input").blur(function() {
+                var itemText = $("#newItemEdit").val();
+                $("#newItemEdit").remove();
+                
+                if (itemText)
+                {
+                  $(".content .table-view").append("<li class=\"table-view-cell\">" + itemText +"</li>");
+                }
+
+              });
+              $("#newItemEdit").focus();
+          });
+
+          $("#editItems").click(function() {
+              $("#editItems").hide();
+              $("#addItem").hide();
+              $("#doneEditItems").show();
+              $(".content .table-view .table-view-cell").append("<button class=\"btn btn-negative\">Remove</button>")
+          });
+
+          $("#doneEditItems").click(function() {
+              $(".content .table-view .table-view-cell .btn").remove();  
+              $("#doneEditItems").hide();
+              $("#editItems").show();
+              $("#addItem").show();
+          });
+      });
+    </script>
   </head>
   <body>
 
     <!-- Make sure all your bars are the first things in your <body> -->
     <header class="bar bar-nav">
-      <a class="icon icon-plus pull-right"></a>
+      <a id="addItem" class="icon icon-plus pull-left"></a>
+      <button id="editItems" class="btn pull-right">Edit</button>
+      <button id="doneEditItems" class="btn pull-right btn-positive" style="display:none">Done</button>
       <h1 class="title">Grocery List</h1>
     </header>
 
     <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
     <div class="content">
       <ul class="table-view">
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 1
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 2
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 3
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 1
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 2
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 3
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 1
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 2
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 3
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 1
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 2
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 3
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 1
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 2
-          </a>
-        </li>
-        <li class="table-view-cell">
-          <a class="navigate-right">
-            Item 3
-          </a>
-        </li>
-
-
-      </ul>
-       
-
+      </ul>         
     </div>
-
-
 
     <nav class="bar bar-tab">
       <a class="tab-item active" href="#">
