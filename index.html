@@ -20,20 +20,68 @@
     <!-- Include the compiled Ratchet JS -->
     <script src="js\ratchet.min.js"></script>
     <script type="text/javascript" src="js\jquery-1.11.0.min.js"></script>
+    <script type="text/javascript">
+      // Array Remove - By John Resig (MIT Licensed)
+      Array.prototype.remove = function(from, to) {
+        var rest = this.slice((to || from) + 1 || this.length);
+        this.length = from < 0 ? this.length + from : from;
+        return this.push.apply(this, rest);
+      };
+    </script>
 
     <script type="text/javascript">
+      var itemsList = [];
+
+      function updateUi() {
+        $(".content .table-view").empty();
+        var list = $(".content .table-view");
+        var anyDoneItems = false;
+        for (var idx = 0; idx < itemsList.length; ++idx)
+        {
+          var item = itemsList[idx];
+          if (!item.done) {
+            list.append("<li itemIdx=\"" + idx + "\" class=\"table-view-cell\"><input type=\"checkbox\"/><span style=\"padding-left:10px\">" + item.text +"</span></li>");
+          } else {
+            anyDoneItems = true;
+          }
+        }
+
+        if (anyDoneItems) {
+          list.append("<li id=\"table-divider\" class=\"table-view-cell table-view-divider\">Done</li>");
+          for (var idx = 0; idx < itemsList.length; ++idx)
+          {
+            var item = itemsList[idx];
+            if (item.done) {            
+              list.append("<li itemIdx=\"" + idx + "\" class=\"table-view-cell\"><input type=\"checkbox\" checked=\"checked\"/><span style=\"padding-left:10px\">" + item.text +"</span></li>");
+            }
+          }
+        }
+
+        $(".content .table-view li input").click(function() {
+            var itemIdx = $(this).parent().attr("itemIdx");
+
+            if (this.checked) {
+              itemsList[itemIdx].done = true;
+            } else {
+              itemsList[itemIdx].done = false;
+            }
+
+            updateUi();
+        });
+      }
+
       $(document).ready(function() {
           $("#addItem").click(function() {
-              $(".content .table-view").append("<input id=\"newItemEdit\"type=\"text\" placeholder=\"new item\"/>");
+              $(".content .table-view").prepend("<input id=\"newItemEdit\"type=\"text\" placeholder=\"new item\"/>");
               $(":input").blur(function() {
                 var itemText = $("#newItemEdit").val();
                 $("#newItemEdit").remove();
                 
                 if (itemText)
                 {
-                  $(".content .table-view").append("<li class=\"table-view-cell\"><input type=\"checkbox\"/><span style=\"padding-left:10px\">" + itemText +"</span></li>");
+                  itemsList.push({ text:itemText, done:false});
+                  updateUi();
                 }
-
               });
               $("#newItemEdit").focus();
           });
@@ -42,20 +90,39 @@
               $("#editItems").hide();
               $("#addItem").hide();
               $("#doneEditItems").show();
-              $(".content .table-view .table-view-cell").append("<button class=\"btn btn-negative btn-remove\">Remove</button>");
+              $(".table-view .table-view-cell").not('.table-view-divider').append("<button class=\"btn btn-negative btn-remove\">Remove</button>");
               $(".btn-remove").click(function() {
-                $(this).parent().remove();
+                if ($(this).hasClass("btn-negative")) {
+                  $(this).parent().css("text-decoration", "line-through");
+                  $(this).text("Cancel");
+                  $(this).removeClass("btn-negative");
+                  $(this).addClass("btn-primary");
+                } else {
+                  $(this).parent().css("text-decoration", "");
+                  $(this).text("Remove");
+                  $(this).removeClass("btn-primary");
+                  $(this).addClass("btn-negative");                  
+                }
               });
           });
 
           $("#doneEditItems").click(function() {
-              $(".content .table-view .table-view-cell .btn").remove();  
+              $(".table-view .table-view-cell").filter(function() {
+                return $(this).css('text-decoration').indexOf("line-through") != -1;
+              }).each(function() {
+                var idx = parseInt($(this).attr("itemIdx"));
+                delete itemsList[idx];
+              })
+
+              itemsList = jQuery.grep(itemsList, function(item){
+                  return item !== undefined;
+              });
+
               $("#doneEditItems").hide();
               $("#editItems").show();
               $("#addItem").show();
+              updateUi();
           });
-
-
       });
     </script>
   </head>
