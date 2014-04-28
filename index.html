@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Grocery List</title>
 
-    <link rel="shortcut icon" href="@Url.Content("favicon.ico")">
+    <link rel="shortcut icon" href="favicon.ico">
 
     <!-- Sets initial viewport load and disables zooming  -->
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
@@ -31,7 +31,7 @@
                 
                 if (itemText)
                 {
-                  $(".content .table-view").append("<li class=\"table-view-cell\">" + itemText +"</li>");
+                  $(".content .table-view").append("<li class=\"table-view-cell\"><input type=\"checkbox\"/><span style=\"padding-left:10px\">" + itemText +"</span></li>");
                 }
 
               });
@@ -42,7 +42,10 @@
               $("#editItems").hide();
               $("#addItem").hide();
               $("#doneEditItems").show();
-              $(".content .table-view .table-view-cell").append("<button class=\"btn btn-negative\">Remove</button>")
+              $(".content .table-view .table-view-cell").append("<button class=\"btn btn-negative btn-remove\">Remove</button>");
+              $(".btn-remove").click(function() {
+                $(this).parent().remove();
+              });
           });
 
           $("#doneEditItems").click(function() {
@@ -51,6 +54,8 @@
               $("#editItems").show();
               $("#addItem").show();
           });
+
+
       });
     </script>
   </head>
@@ -67,8 +72,9 @@
     <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
     <div class="content">
       <ul class="table-view">
-      </ul>         
+      </ul>
     </div>
+      
 
     <nav class="bar bar-tab">
       <a class="tab-item active" href="#">
