@@ -139,6 +139,7 @@
                   
                   if (itemText)
                   {
+                    itemText = itemText.charAt(0).toUpperCase() + itemText.slice(1);
                     itemsList.push({ text:itemText, done:false});
                     localStorage['itemsList'] = JSON.stringify(itemsList);
                     updateUi();
