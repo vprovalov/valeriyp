@@ -20,6 +20,10 @@
     <!-- Include the compiled Ratchet JS -->
     <script src="js\ratchet.min.js"></script>
     <script type="text/javascript" src="js\jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="js\jquery.autocomplete.min.js"></script>
+
+    <link href="css\autocomplete.css" rel="stylesheet">
+
     <script type="text/javascript">
       // Array Remove - By John Resig (MIT Licensed)
       Array.prototype.remove = function(from, to) {
@@ -29,8 +33,10 @@
       };
     </script>
 
+    <script src="js\grocerylist.js"></script>
     <script type="text/javascript">
       var itemsList = [];
+
       if (localStorage['itemsList'])
       {
         itemsList = JSON.parse(localStorage['itemsList']);
@@ -118,15 +124,25 @@
       $(document).ready(function() {
           $("#addItem").click(function() {
               $(".content .table-view").prepend("<input id=\"newItemEdit\"type=\"text\" placeholder=\"new item\"/>");
+              
+              $(":input").autocomplete({ 
+                lookup: groceries,
+                onSelect: function (suggestion) {
+                  $("#newItemEdit").focus();
+                }
+              });
+
               $(":input").blur(function() {
-                var itemText = $("#newItemEdit").val();
-                $("#newItemEdit").remove();
-                
-                if (itemText)
-                {
-                  itemsList.push({ text:itemText, done:false});
-                  localStorage['itemsList'] = JSON.stringify(itemsList);
-                  updateUi();
+                if ($(".autocomplete-suggestions:visible").length == 0) {
+                  var itemText = $("#newItemEdit").val();
+                  $("#newItemEdit").remove();
+                  
+                  if (itemText)
+                  {
+                    itemsList.push({ text:itemText, done:false});
+                    localStorage['itemsList'] = JSON.stringify(itemsList);
+                    updateUi();
+                  }
                 }
               });
               $("#newItemEdit").focus();
