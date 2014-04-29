@@ -31,6 +31,11 @@
 
     <script type="text/javascript">
       var itemsList = [];
+      if (localStorage['itemsList'])
+      {
+        itemsList = JSON.parse(localStorage['itemsList']);
+      }
+
       ModesEnum = {
         PlanTab : 0,
         ShopTab : 1
@@ -120,6 +125,7 @@
                 if (itemText)
                 {
                   itemsList.push({ text:itemText, done:false});
+                  localStorage['itemsList'] = JSON.stringify(itemsList);
                   updateUi();
                 }
               });
@@ -157,6 +163,7 @@
               itemsList = jQuery.grep(itemsList, function(item){
                   return item !== undefined;
               });
+              localStorage['itemsList'] = JSON.stringify(itemsList);
 
               $("#doneEditItems").hide();
               $("#editItems").show();
