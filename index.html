@@ -31,9 +31,32 @@
 
     <script type="text/javascript">
       var itemsList = [];
+      ModesEnum = {
+        PlanTab : 0,
+        ShopTab : 1
+      };
 
-      function updateUi() {
-        $(".content .table-view").empty();
+      var mode = ModesEnum.PlanTab;
+
+      function PlanUi() {
+        $(".content").append("<ul class=\"table-view\"></ul>");
+
+        var list = $(".content .table-view");
+        var anyDoneItems = false;
+        for (var idx = 0; idx < itemsList.length; ++idx)
+        {
+          var item = itemsList[idx];
+          if (!item.done) {
+            list.append("<li itemIdx=\"" + idx + "\" class=\"table-view-cell\"><span style=\"padding-left:10px\">" + item.text +"</span></li>");
+          }
+        }
+
+        $("#addItem").show();
+        $("#editItems").show();
+      }
+
+      function ShopUi() {        
+        $(".content").append("<ul class=\"table-view\"></ul>");
         var list = $(".content .table-view");
         var anyDoneItems = false;
         for (var idx = 0; idx < itemsList.length; ++idx)
@@ -68,6 +91,23 @@
 
             updateUi();
         });
+
+        $("#addItem").hide();
+        $("#editItems").hide();
+      }
+
+      function updateUi() {
+        $(".content").empty();
+
+        if (mode == ModesEnum.PlanTab) {
+          $("#PlanTab").addClass("active");
+          $("#ShopTab").removeClass("active");
+          PlanUi();
+        } else if (mode == ModesEnum.ShopTab) {
+          $("#PlanTab").removeClass("active");
+          $("#ShopTab").addClass("active");
+          ShopUi();
+        }        
       }
 
       $(document).ready(function() {
@@ -123,6 +163,13 @@
               $("#addItem").show();
               updateUi();
           });
+
+          $(".tab-item").click(function() {
+              mode = ModesEnum[$(this)[0].id];
+              updateUi();
+          });
+
+          updateUi();
       });
     </script>
   </head>
@@ -138,19 +185,16 @@
 
     <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
     <div class="content">
-      <ul class="table-view">
-      </ul>
     </div>
-      
 
     <nav class="bar bar-tab">
-      <a class="tab-item active" href="#">
+      <a id="PlanTab" class="tab-item" href="#">
         <span class="icon icon-list"></span>
-        <span class="tab-label">List</span>
+        <span class="tab-label">Plan</span>
       </a>
-      <a class="tab-item" href="#">
+      <a id="ShopTab" class="tab-item" href="#">
         <span class="icon icon-gear"></span>
-        <span class="tab-label">Settings</span>
+        <span class="tab-label">Shop</span>
       </a>
     </nav>
   </body>
