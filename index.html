@@ -40,6 +40,11 @@
       if (localStorage['itemsList'])
       {
         itemsList = JSON.parse(localStorage['itemsList']);
+        for (var i = itemsList.length - 1; i >= 0; i--) {
+          if (itemsList[i].date) {
+            itemsList[i].date = new Date(itemsList[i].date);
+          }          
+        }
       }
 
       ModesEnum = {
@@ -66,6 +71,12 @@
         $("#editItems").show();
       }
 
+      function AddItem(itemText)
+      {
+        itemsList.push({ text:itemText, done:false});
+        localStorage['itemsList'] = JSON.stringify(itemsList);
+      }
+
       function ShopUi() {        
         $(".content").append("<ul class=\"table-view\"></ul>");
         var list = $(".content .table-view");
@@ -81,12 +92,46 @@
         }
 
         if (anyDoneItems) {
-          list.append("<li id=\"table-divider\" class=\"table-view-cell table-view-divider\">Done</li>");
+          var doneItems = {};
+
           for (var idx = 0; idx < itemsList.length; ++idx)
           {
             var item = itemsList[idx];
-            if (item.done) {            
-              list.append("<li itemIdx=\"" + idx + "\" class=\"table-view-cell\"><input type=\"checkbox\" checked=\"checked\"/><span style=\"padding-left:10px\">" + item.text +"</span></li>");
+
+            if (item.done) {
+              var doneItem = doneItems[item.text];
+              if (!doneItem || !doneItem.date || doneItem.date.getTime() < item.date.getTime()) {
+                  doneItems[item.text] = idx;
+              }
+            }
+          }
+
+          list.append("<li id=\"table-divider\" class=\"table-view-cell table-view-divider\">Done</li>");
+          for (var itemText in doneItems)
+          {
+            var idx = doneItems[itemText];
+            var item = itemsList[idx];
+
+            if (item.done) {
+              var text = item.text;
+
+              if (item.date)
+              {
+                var seconds = Math.floor(((new Date()).getTime() - item.date.getTime())/1000);
+                var minutes = Math.floor(seconds/60);
+                var hours = Math.floor(minutes/60);
+                var days = Math.floor(hours/24);
+
+                if (days > 0) {
+                  text += " (" + days + "days)";
+                } else if (hours > 0) {
+                  text += " (" + hours + "hrs)";
+                } else if (minutes > 0) {
+                  text += " (" + minutes + "mins)";
+                }
+              }
+
+              list.append("<li itemIdx=\"" + idx + "\" class=\"table-view-cell\"><input type=\"checkbox\" checked=\"checked\"/><span style=\"padding-left:10px\">" + text +"</span></li>");
             }
           }
         }
@@ -96,18 +141,26 @@
 
             if (this.checked) {
               itemsList[itemIdx].done = true;
+              
+              if (!itemsList[itemIdx].date) 
+              {
+                itemsList[itemIdx].date = new Date();
+              }
             } else {
               itemsList[itemIdx].done = false;
+              delete itemsList[itemIdx].date;
             }
 
-            updateUi();
+            localStorage['itemsList'] = JSON.stringify(itemsList);
+
+            UpdateUi();
         });
 
         $("#addItem").hide();
         $("#editItems").hide();
       }
 
-      function updateUi() {
+      function UpdateUi() {
         $(".content").empty();
 
         if (mode == ModesEnum.PlanTab) {
@@ -140,9 +193,8 @@
                   if (itemText)
                   {
                     itemText = itemText.charAt(0).toUpperCase() + itemText.slice(1);
-                    itemsList.push({ text:itemText, done:false});
-                    localStorage['itemsList'] = JSON.stringify(itemsList);
-                    updateUi();
+                    AddItem(itemText);
+                    UpdateUi();
                   }
                 }
               });
@@ -185,15 +237,15 @@
               $("#doneEditItems").hide();
               $("#editItems").show();
               $("#addItem").show();
-              updateUi();
+              UpdateUi();
           });
 
           $(".tab-item").click(function() {
               mode = ModesEnum[$(this)[0].id];
-              updateUi();
+              UpdateUi();
           });
 
-          updateUi();
+          UpdateUi();
       });
     </script>
   </head>
