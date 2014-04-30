@@ -123,7 +123,7 @@
 
       $(document).ready(function() {
           $("#addItem").click(function() {
-              $(".content .table-view").prepend("<input id=\"newItemEdit\"type=\"text\" placeholder=\"new item\"/>");
+              $(".content .table-view").prepend("<input id=\"newItemEdit\"type=\"text\" placeholder=\"new item\" autocomplete=\"off\"/>");
               
               $(":input").autocomplete({ 
                 lookup: groceries,
