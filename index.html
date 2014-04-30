@@ -36,6 +36,10 @@
     <script src="js\grocerylist.js"></script>
     <script type="text/javascript">
       var itemsList = [];
+      var currentLocation = {
+        latitude: 0,
+        longitude: 0
+      }
 
       if (localStorage['itemsList'])
       {
@@ -73,7 +77,26 @@
 
       function AddItem(itemText)
       {
-        itemsList.push({ text:itemText, done:false});
+        itemsList.push({ text:itemText, done:false, addedLocation: currentLocation });
+        localStorage['itemsList'] = JSON.stringify(itemsList);
+      }
+
+      function CheckItem(itemIdx, done)
+      {
+        var item = itemsList[itemIdx];
+
+        item.done = done;
+        if (done) 
+        {
+          if (!item.date) 
+          {
+            item.date = new Date();
+            item.doneLocation = currentLocation;
+          }
+        } else {
+          delete item.date;
+        }
+
         localStorage['itemsList'] = JSON.stringify(itemsList);
       }
 
@@ -138,21 +161,7 @@
 
         $(".content .table-view li input").click(function() {
             var itemIdx = $(this).parent().attr("itemIdx");
-
-            if (this.checked) {
-              itemsList[itemIdx].done = true;
-              
-              if (!itemsList[itemIdx].date) 
-              {
-                itemsList[itemIdx].date = new Date();
-              }
-            } else {
-              itemsList[itemIdx].done = false;
-              delete itemsList[itemIdx].date;
-            }
-
-            localStorage['itemsList'] = JSON.stringify(itemsList);
-
+            CheckItem(itemIdx, this.checked);
             UpdateUi();
         });
 
@@ -161,6 +170,11 @@
       }
 
       function UpdateUi() {
+        navigator.geolocation.getCurrentPosition(function(location) {
+            currentLocation.latitude = location.coords.latitude;            
+            currentLocation.longitude = location.coords.longitude;
+        });
+
         $(".content").empty();
 
         if (mode == ModesEnum.PlanTab) {
@@ -245,7 +259,7 @@
               UpdateUi();
           });
 
-          UpdateUi();
+          UpdateUi();          
       });
     </script>
   </head>
