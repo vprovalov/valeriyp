@@ -61,6 +61,7 @@
       };
 
       var mode = ModesEnum.PlanTab;
+      var storeName = undefined;
 
       function Distance(lat1, lon1, lat2, lon2) {
         var radlat1 = Math.PI * lat1/180;
@@ -99,6 +100,7 @@
       }
 
       function PlanUi() {
+        $("header h1").text("Grocery List");
         $(".content").append("<ul class=\"table-view\"></ul>");
 
         var list = $(".content .table-view");
@@ -144,7 +146,14 @@
         return 'geolocation' in navigator;
       }
 
-      function ShopUi() {        
+      function ShopUi() {
+        if (storeName)
+        {
+          $("header h1").text("In: " + storeName);
+        } else {
+          $("header h1").text("Grocery List");
+        }
+
         $(".content").append("<ul class=\"table-view\"></ul>");
         var list = $(".content .table-view");
         var anyDoneItems = false;
@@ -223,8 +232,9 @@
 
         if (decideMode) {
           decideMode = false;
+          storeName = FindNearestStore();
 
-          if (FindNearestStore()) {
+          if (storeName) {
             mode = ModesEnum.ShopTab;
             UpdateUi();
           }
@@ -233,8 +243,15 @@
 
       function UpdateUi() {
         navigator.geolocation.getCurrentPosition(function(location) {
-          UpdateCoordinates(location.coords.latitude, location.coords.longitude);
+            if (location.accuracy < 200) {
+                UpdateCoordinates(location.coords.latitude, location.coords.longitude);
+            }
         });
+
+//        window.setTimeout(function() {
+//          //UpdateCoordinates(47.614844, -122.194148);
+//          UpdateCoordinates(47.61294734593398, -122.20082654942799);
+//        }, 1000);
 
         $(".content").empty();
 
