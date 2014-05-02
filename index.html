@@ -34,12 +34,16 @@
     </script>
 
     <script src="js\grocerylist.js"></script>
+    <script src="js\storeslist.js"></script>
+
     <script type="text/javascript">
       var itemsList = [];
       var currentLocation = {
         latitude: 0,
         longitude: 0
       }
+
+      var decideMode = true;
 
       if (localStorage['itemsList'])
       {
@@ -57,6 +61,42 @@
       };
 
       var mode = ModesEnum.PlanTab;
+
+      function Distance(lat1, lon1, lat2, lon2) {
+        var radlat1 = Math.PI * lat1/180;
+        var radlat2 = Math.PI * lat2/180;
+        var radlon1 = Math.PI * lon1/180;
+        var radlon2 = Math.PI * lon2/180;
+        var theta = lon1 - lon2;
+        var radtheta = Math.PI * theta/180;
+        var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+        dist = Math.acos(dist);
+        dist = dist * 180/Math.PI;
+        dist = dist * 60 * 1.1515;
+        return dist * 1.609344;
+      }
+
+      function FindNearestStore() {
+        var name = undefined;
+
+        if (currentLocation) {
+          var nearestDistance = Distance(currentLocation.latitude, currentLocation.longitude, stores[0].latitude, stores[0].longitude);
+          
+          for (var i = 1; i < stores.length; ++i) {
+            var distance = Distance(currentLocation.latitude, currentLocation.longitude, stores[i].latitude, stores[i].longitude);
+            if (nearestDistance > distance) {
+              name = stores[i].name;
+              nearestDistance = distance;
+            }
+          }
+
+          if (nearestDistance > 0.03) {
+            name = undefined;
+          }          
+        }
+
+        return name;
+      }
 
       function PlanUi() {
         $(".content").append("<ul class=\"table-view\"></ul>");
@@ -98,6 +138,10 @@
         }
 
         localStorage['itemsList'] = JSON.stringify(itemsList);
+      }
+
+      function supports_geolocation() {
+        return 'geolocation' in navigator;
       }
 
       function ShopUi() {        
@@ -146,15 +190,19 @@
                 var days = Math.floor(hours/24);
 
                 if (days > 0) {
-                  text += " (" + days + "days)";
+                  text += " (" + days + "day" + (days == 1 ? "" : "s") + ")";
                 } else if (hours > 0) {
-                  text += " (" + hours + "hrs)";
+                  text += " (" + hours + "hr" + (hours == 1 ? "" : "s") + ")";
                 } else if (minutes > 0) {
-                  text += " (" + minutes + "mins)";
+                  text += " (" + minutes + "min" + (minutes == 1 ? "" : "s") + ")";
+                } else {
+                  text += " (now)";
                 }
               }
 
-              list.append("<li itemIdx=\"" + idx + "\" class=\"table-view-cell\"><input type=\"checkbox\" checked=\"checked\"/><span style=\"padding-left:10px\">" + text +"</span></li>");
+              list.append("<li itemIdx=\"" + idx + "\" class=\"table-view-cell\">" + 
+                (days + hours == 0 ? "<input type=\"checkbox\" checked=\"checked\"/>" : "")
+                + "<span style=\"padding-left:10px\">" + text +"</span></li>");
             }
           }
         }
@@ -169,10 +217,23 @@
         $("#editItems").hide();
       }
 
+      function UpdateCoordinates(lat, lng) {
+        currentLocation.latitude = lat;
+        currentLocation.longitude = lng;
+
+        if (decideMode) {
+          decideMode = false;
+
+          if (FindNearestStore()) {
+            mode = ModesEnum.ShopTab;
+            UpdateUi();
+          }
+        }
+      }
+
       function UpdateUi() {
         navigator.geolocation.getCurrentPosition(function(location) {
-            currentLocation.latitude = location.coords.latitude;            
-            currentLocation.longitude = location.coords.longitude;
+          UpdateCoordinates(location.coords.latitude, location.coords.longitude);
         });
 
         $(".content").empty();
@@ -259,7 +320,7 @@
               UpdateUi();
           });
 
-          UpdateUi();          
+          UpdateUi();
       });
     </script>
   </head>
