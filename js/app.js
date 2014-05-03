@@ -254,15 +254,10 @@ function UpdateCoordinates(lat, lng, radius) {
 
 function UpdateUi() {
     navigator.geolocation.getCurrentPosition(function (location) {
-        if (location.accuracy < 200) {
+        if (location.coords.accuracy < 100) {
             UpdateCoordinates(location.coords.latitude, location.coords.longitude, location.coords.accuracy);
         }
     });
-
-//    window.setTimeout(function() {
-//        //UpdateCoordinates(47.614844, -122.194148, 50);
-//        UpdateCoordinates(47.61294734593398, -122.20082654942799, 50);
-//    }, 1000);
 
     $(".content").empty();
 
