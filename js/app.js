@@ -82,7 +82,7 @@ function FindNearestStore() {
 }
 
 function PlanUi() {
-    $("header h1").text("Grocery List");
+    $("#headerBar").show();
     $(".content").append("<ul class=\"table-view\"></ul>");
 
     var list = $(".content .table-view");
@@ -320,6 +320,10 @@ $(document).ready(function () {
 
         $(":input").autocomplete({
             lookup: groceries,
+            lookupFilter: function (suggestion, query, queryLowerCase) {
+                var idx = suggestion.value.toLowerCase().indexOf(queryLowerCase);
+                return idx !== -1 && (idx == 0 || suggestion.value[idx - 1] === ' ');
+            },
             onSelect: function (suggestion) {
                 $("#newItemEdit").focus();
             }
