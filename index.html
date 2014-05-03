@@ -22,6 +22,8 @@
     <script type="text/javascript" src="js\jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="js\jquery.autocomplete.min.js"></script>
 
+    <script src="https://www.dropbox.com/static/api/dropbox-datastores-1.0-latest.js" type="text/javascript"></script>
+
     <link href="css\autocomplete.css" rel="stylesheet">
 
     <script type="text/javascript">
@@ -51,11 +53,18 @@
     <div class="content">
     </div>
 
-    <nav class="bar bar-tab">
+    <!-- Block button in standard bar fixed above the footer -->
+    <div id="footerBar" class="bar bar-standard bar-footer-secondary">
+        <button id="syncWithDropbox" class="btn btn-block btn-primary" style="display:none">Sync with dropbox</button>
+        <button id="authWithDropbox" class="btn btn-block btn-primary" style="display:none">Enable dropbox</button>
+    </div>
+
+    <nav class="bar bar-tab bar-footer">
       <a id="PlanTab" class="tab-item" href="#">
         <span class="icon icon-list"></span>
         <span class="tab-label">Plan</span>
       </a>
+
       <a id="ShopTab" class="tab-item" href="#">
         <span class="icon icon-gear"></span>
         <span class="tab-label">Shop</span>
