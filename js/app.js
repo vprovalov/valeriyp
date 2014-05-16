@@ -194,9 +194,18 @@ function ShopUi() {
             }
         }
 
-        list.append("<li id=\"table-divider\" class=\"table-view-cell table-view-divider\">Done</li>");
+        var indecies = [];
         for (var itemText in doneItems) {
-            var idx = doneItems[itemText];
+            indecies.push(doneItems[itemText]);
+        }
+
+        indecies.sort(function(a, b) {
+           return itemsList[b].date.getTime() - itemsList[a].date.getTime();
+        });
+
+        list.append("<li id=\"table-divider\" class=\"table-view-cell table-view-divider\">Done</li>");
+        for (var i = 0; i < indecies.length; ++i) {
+            var idx = indecies[i];
             var item = itemsList[idx];
 
             if (item.done) {
