@@ -283,6 +283,17 @@ function initDropboxDatastoreManager() {
     });
 }
 
+function NewItemAddEnded() {
+    var itemText = $("#newItemEdit").val();
+    $("#newItemEdit").remove();
+
+    if (itemText) {
+        itemText = itemText.charAt(0).toUpperCase() + itemText.slice(1);
+        AddItem(itemText);
+        UpdateUi();
+    }
+}
+
 $(document).ready(function () {
     $("#authWithDropbox").click(function() {
         dropboxClient.authenticate();
@@ -325,20 +336,18 @@ $(document).ready(function () {
                 return idx !== -1 && (idx == 0 || suggestion.value[idx - 1] === ' ');
             },
             onSelect: function (suggestion) {
-                $("#newItemEdit").focus();
+            }
+        });
+
+        $(':input').keypress(function (e) {
+            if (e.which == 13) {
+                NewItemAddEnded();
             }
         });
 
         $(":input").blur(function () {
             if ($(".autocomplete-suggestions:visible").length == 0) {
-                var itemText = $("#newItemEdit").val();
-                $("#newItemEdit").remove();
-
-                if (itemText) {
-                    itemText = itemText.charAt(0).toUpperCase() + itemText.slice(1);
-                    AddItem(itemText);
-                    UpdateUi();
-                }
+                NewItemAddEnded();
             }
         });
         $("#newItemEdit").focus();
