@@ -331,11 +331,13 @@ $(document).ready(function () {
 
         $(":input").autocomplete({
             lookup: groceries,
+            triggerSelectOnValidInput: false,
             lookupFilter: function (suggestion, query, queryLowerCase) {
                 var idx = suggestion.value.toLowerCase().indexOf(queryLowerCase);
                 return idx !== -1 && (idx == 0 || suggestion.value[idx - 1] === ' ');
             },
             onSelect: function (suggestion) {
+                $(":input").focus();
             }
         });
 
