@@ -24,12 +24,8 @@ ModesEnum = {
 
 var mode = ModesEnum.PlanTab;
 var storeName = undefined;
-var dropboxClient;
-var datastoreManager;
-var dropboxItemsListTable;
 
-function ToRadians(degrees)
-{
+function ToRadians(degrees) {
     return Math.PI / 180.0 * degrees;
 }
 
@@ -103,44 +99,6 @@ function AddItem(itemText) {
     localStorage['itemsList'] = JSON.stringify(itemsList);
 }
 
-function synchronizeWithDropBox() {
-    var allRecords = dropboxItemsListTable.query({});
-    for (var idx = 0; idx < allRecords.length; ++idx) {
-        dropboxItemsListTable.get(allRecords[idx].getId()).deleteRecord();
-    }
-
-    for (var idx = 0; idx < itemsList.length; ++idx)
-    {
-        var item = itemsList[idx];
-
-        var dropboxRecord = {
-            text: item.text
-        };
-
-        if (item.done)
-        {
-            dropboxRecord.done = item.done;
-        }
-
-        if (item.date)
-        {
-            dropboxRecord.date = item.date;
-        }
-
-        if (item.addedLocation) {
-            dropboxRecord.addedLocationLatitude = item.addedLocation.latitude;
-            dropboxRecord.addedLocationLongitude = item.addedLocation.longitude;
-        }
-
-        if (item.doneLocation) {
-            dropboxRecord.doneLocationLatitude = item.doneLocation.latitude;
-            dropboxRecord.doneLocationLongitude = item.doneLocation.longitude;
-        }
-
-        dropboxItemsListTable.insert(dropboxRecord).getId();
-    }
-}
-
 function CheckItem(itemIdx, done) {
     var item = itemsList[itemIdx];
 
@@ -155,10 +113,6 @@ function CheckItem(itemIdx, done) {
     }
 
     localStorage['itemsList'] = JSON.stringify(itemsList);
-}
-
-function supports_geolocation() {
-    return 'geolocation' in navigator;
 }
 
 function ShopUi() {
@@ -281,17 +235,6 @@ function UpdateUi() {
     }
 }
 
-function initDropboxDatastoreManager() {
-    datastoreManager = dropboxClient.getDatastoreManager();
-    datastoreManager.openDefaultDatastore(function (error, datastore) {
-        if (error) {
-            alert('Error opening default datastore: ' + error);
-        }
-
-        dropboxItemsListTable = datastore.getTable('itemsList');
-    });
-}
-
 function NewItemAddEnded() {
     var itemText = $("#newItemEdit").val();
     $("#newItemEdit").remove();
@@ -304,37 +247,6 @@ function NewItemAddEnded() {
 }
 
 $(document).ready(function () {
-    $("#authWithDropbox").click(function() {
-        dropboxClient.authenticate();
-        if (dropboxClient.isAuthenticated())
-        {
-            initDropboxDatastoreManager();
-        }
-    });
-
-    $("#syncWithDropbox").click(function() {
-        synchronizeWithDropBox();
-    });
-
-    dropboxClient = new Dropbox.Client({key: "4x85xeyom9b4lrp"});
-
-    // Try to finish OAuth authorization.
-    dropboxClient.authenticate({interactive: false}, function (error) {
-        if (error) {
-            alert('Authentication error: ' + error);
-        }
-    });
-
-    if (dropboxClient.isAuthenticated()) {
-        initDropboxDatastoreManager();
-
-        $("#syncWithDropbox").show();
-        $("#authWithDropbox").hide();
-    } else {
-        $("#syncWithDropbox").hide();
-        $("#authWithDropbox").show();
-    }
-
     $("#addItem").click(function () {
         $(".content .table-view").prepend("<input id=\"newItemEdit\"type=\"text\" placeholder=\"new item\" autocomplete=\"off\" spellcheck=\"false\"/>");
 
